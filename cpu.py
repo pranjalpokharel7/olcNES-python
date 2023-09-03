@@ -5,7 +5,280 @@ from bus import BUS_6502
 
 class CPU6502:
     def __init__(self) -> None:
-        pass
+        self.instruction_set = [
+            # high nibble 0000
+            self.Instruction6502(name="BRK", op_fn=self.op_brk, am_fn=self.am_imm, cycles=7),
+            self.Instruction6502(name="ORA", op_fn=self.op_ora, am_fn=self.am_idx, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="ORA", op_fn=self.op_ora, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="ASL", op_fn=self.op_asl, am_fn=self.am_zpg, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="PHP", op_fn=self.op_php, am_fn=self.am_imp, cycles=3),
+            self.Instruction6502(name="ORA", op_fn=self.op_ora, am_fn=self.am_imm, cycles=2),
+            self.Instruction6502(name="ASL", op_fn=self.op_asl, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="ORA", op_fn=self.op_ora, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="ASL", op_fn=self.op_asl, am_fn=self.am_abs, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 0001
+            self.Instruction6502(name="BPL", op_fn=self.op_bpl, am_fn=self.am_rel, cycles=2),
+            self.Instruction6502(name="ORA", op_fn=self.op_ora, am_fn=self.am_idy, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="ORA", op_fn=self.op_ora, am_fn=self.am_zpx, cycles=4),
+            self.Instruction6502(name="ASL", op_fn=self.op_asl, am_fn=self.am_zpx, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="CLC", op_fn=self.op_clc, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="ORA", op_fn=self.op_ora, am_fn=self.am_aby, cycles=4),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="ORA", op_fn=self.op_ora, am_fn=self.am_abx, cycles=4),
+            self.Instruction6502(name="ASL", op_fn=self.op_asl, am_fn=self.am_abx, cycles=7),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 0010
+            self.Instruction6502(name="JSR", op_fn=self.op_jsr, am_fn=self.am_rel, cycles=6),
+            self.Instruction6502(name="AND", op_fn=self.op_and, am_fn=self.am_idx, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="BIT", op_fn=self.op_bit, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="AND", op_fn=self.op_and, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="ROL", op_fn=self.op_rol, am_fn=self.am_zpg, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="PLP", op_fn=self.op_plp, am_fn=self.am_imp, cycles=4),
+            self.Instruction6502(name="AND", op_fn=self.op_and, am_fn=self.am_imm, cycles=2),
+            self.Instruction6502(name="ROL", op_fn=self.op_rol, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="BIT", op_fn=self.op_bit, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="AND", op_fn=self.op_and, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="ROL", op_fn=self.op_rol, am_fn=self.am_abs, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 0011
+            self.Instruction6502(name="BMI", op_fn=self.op_bmi, am_fn=self.am_rel, cycles=2),
+            self.Instruction6502(name="AND", op_fn=self.op_and, am_fn=self.am_idy, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="AND", op_fn=self.op_and, am_fn=self.am_zpx, cycles=4),
+            self.Instruction6502(name="ROL", op_fn=self.op_rol, am_fn=self.am_zpx, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="SEC", op_fn=self.op_sec, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="AND", op_fn=self.op_and, am_fn=self.am_aby, cycles=4),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="AND", op_fn=self.op_and, am_fn=self.am_abx, cycles=4),
+            self.Instruction6502(name="ROL", op_fn=self.op_rol, am_fn=self.am_abx, cycles=7),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 0100
+            self.Instruction6502(name="RTI", op_fn=self.op_rti, am_fn=self.am_imp, cycles=6),
+            self.Instruction6502(name="EOR", op_fn=self.op_eor, am_fn=self.am_idx, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="EOR", op_fn=self.op_eor, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="LSR", op_fn=self.op_lsr, am_fn=self.am_zpg, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="PHA", op_fn=self.op_pha, am_fn=self.am_imp, cycles=3),
+            self.Instruction6502(name="EOR", op_fn=self.op_eor, am_fn=self.am_imm, cycles=2),
+            self.Instruction6502(name="LSR", op_fn=self.op_lsr, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="JMP", op_fn=self.op_jmp, am_fn=self.am_abs, cycles=3),
+            self.Instruction6502(name="EOR", op_fn=self.op_eor, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="LSR", op_fn=self.op_lsr, am_fn=self.am_abs, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 0101
+            self.Instruction6502(name="BVC", op_fn=self.op_bvc, am_fn=self.am_rel, cycles=2),
+            self.Instruction6502(name="EOR", op_fn=self.op_eor, am_fn=self.am_idy, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="EOR", op_fn=self.op_eor, am_fn=self.am_zpx, cycles=4),
+            self.Instruction6502(name="LSR", op_fn=self.op_lsr, am_fn=self.am_zpx, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="CLI", op_fn=self.op_cli, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="EOR", op_fn=self.op_eor, am_fn=self.am_aby, cycles=4),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="EOR", op_fn=self.op_eor, am_fn=self.am_abx, cycles=4),
+            self.Instruction6502(name="LSR", op_fn=self.op_lsr, am_fn=self.am_abx, cycles=7),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 0110
+            self.Instruction6502(name="RTS", op_fn=self.op_rts, am_fn=self.am_imp, cycles=6),
+            self.Instruction6502(name="ADC", op_fn=self.op_adc, am_fn=self.am_idx, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="ADC", op_fn=self.op_adc, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="ROR", op_fn=self.op_ror, am_fn=self.am_zpg, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="PLA", op_fn=self.op_pla, am_fn=self.am_imp, cycles=4),
+            self.Instruction6502(name="ADC", op_fn=self.op_adc, am_fn=self.am_imm, cycles=2),
+            self.Instruction6502(name="ROR", op_fn=self.op_ror, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="JMP", op_fn=self.op_jmp, am_fn=self.am_ind, cycles=3),
+            self.Instruction6502(name="ADC", op_fn=self.op_adc, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="ROR", op_fn=self.op_ror, am_fn=self.am_abs, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 0111
+            self.Instruction6502(name="BVS", op_fn=self.op_bvs, am_fn=self.am_rel, cycles=2),
+            self.Instruction6502(name="ADC", op_fn=self.op_adc, am_fn=self.am_idy, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="ADC", op_fn=self.op_adc, am_fn=self.am_zpx, cycles=4),
+            self.Instruction6502(name="ROR", op_fn=self.op_ror, am_fn=self.am_zpx, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="SEI", op_fn=self.op_sei, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="ADC", op_fn=self.op_adc, am_fn=self.am_aby, cycles=4),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="ADC", op_fn=self.op_adc, am_fn=self.am_abx, cycles=4),
+            self.Instruction6502(name="ROR", op_fn=self.op_ror, am_fn=self.am_abx, cycles=7),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 1000
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="STA", op_fn=self.op_sta, am_fn=self.am_idx, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="STY", op_fn=self.op_sty, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="STA", op_fn=self.op_sta, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="STX", op_fn=self.op_stx, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="DEY", op_fn=self.op_dey, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="TXA", op_fn=self.op_txa, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="STY", op_fn=self.op_sty, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="STA", op_fn=self.op_sta, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="STX", op_fn=self.op_stx, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 1001
+            self.Instruction6502(name="BCC", op_fn=self.op_bcc, am_fn=self.am_rel, cycles=2),
+            self.Instruction6502(name="STA", op_fn=self.op_sta, am_fn=self.am_idy, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="STY", op_fn=self.op_sty, am_fn=self.am_zpx, cycles=4),
+            self.Instruction6502(name="STA", op_fn=self.op_sta, am_fn=self.am_zpx, cycles=4),
+            self.Instruction6502(name="STX", op_fn=self.op_stx, am_fn=self.am_zpy, cycles=4),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="TYA", op_fn=self.op_tya, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="STA", op_fn=self.op_sta, am_fn=self.am_aby, cycles=5),
+            self.Instruction6502(name="TXS", op_fn=self.op_txs, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="STA", op_fn=self.op_sta, am_fn=self.am_abx, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 1010
+            self.Instruction6502(name="LDY", op_fn=self.op_ldy, am_fn=self.am_imm, cycles=2),
+            self.Instruction6502(name="LDA", op_fn=self.op_lda, am_fn=self.am_idx, cycles=6),
+            self.Instruction6502(name="LDX", op_fn=self.op_ldx, am_fn=self.am_imm, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="LDY", op_fn=self.op_ldy, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="LDA", op_fn=self.op_lda, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="LDX", op_fn=self.op_ldx, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="TAY", op_fn=self.op_tay, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="LDA", op_fn=self.op_lda, am_fn=self.am_imm, cycles=2),
+            self.Instruction6502(name="TAX", op_fn=self.op_tax, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="LDY", op_fn=self.op_ldy, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="LDA", op_fn=self.op_lda, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="LDX", op_fn=self.op_ldx, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 1011
+            self.Instruction6502(name="BCS", op_fn=self.op_bcs, am_fn=self.am_rel, cycles=2),
+            self.Instruction6502(name="LDA", op_fn=self.op_lda, am_fn=self.am_idy, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="LDY", op_fn=self.op_ldy, am_fn=self.am_zpx, cycles=4),
+            self.Instruction6502(name="LDA", op_fn=self.op_lda, am_fn=self.am_zpx, cycles=4),
+            self.Instruction6502(name="LDX", op_fn=self.op_ldx, am_fn=self.am_zpy, cycles=4),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="CLV", op_fn=self.op_clv, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="LDA", op_fn=self.op_lda, am_fn=self.am_aby, cycles=4),
+            self.Instruction6502(name="TSX", op_fn=self.op_tsx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="LDY", op_fn=self.op_ldy, am_fn=self.am_abx, cycles=4),
+            self.Instruction6502(name="LDA", op_fn=self.op_lda, am_fn=self.am_abx, cycles=4),
+            self.Instruction6502(name="LDX", op_fn=self.op_ldx, am_fn=self.am_aby, cycles=4),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 1100
+            self.Instruction6502(name="CPY", op_fn=self.op_cpy, am_fn=self.am_imm, cycles=2),
+            self.Instruction6502(name="CMP", op_fn=self.op_cmp, am_fn=self.am_idx, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="CPY", op_fn=self.op_cpy, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="CMP", op_fn=self.op_cmp, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="DEC", op_fn=self.op_dec, am_fn=self.am_zpg, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="INY", op_fn=self.op_iny, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="CMP", op_fn=self.op_cmp, am_fn=self.am_imm, cycles=2),
+            self.Instruction6502(name="DEX", op_fn=self.op_dex, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="CPY", op_fn=self.op_cpy, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="CMP", op_fn=self.op_cmp, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="DEC", op_fn=self.op_dec, am_fn=self.am_abs, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 1101
+            self.Instruction6502(name="BNE", op_fn=self.op_bne, am_fn=self.am_rel, cycles=2),
+            self.Instruction6502(name="CMP", op_fn=self.op_cmp, am_fn=self.am_idy, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="CMP", op_fn=self.op_cmp, am_fn=self.am_zpx, cycles=4),
+            self.Instruction6502(name="DEC", op_fn=self.op_dec, am_fn=self.am_zpx, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="CLD", op_fn=self.op_cld, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="CMP", op_fn=self.op_cmp, am_fn=self.am_aby, cycles=4),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="CMP", op_fn=self.op_cmp, am_fn=self.am_abx, cycles=4),
+            self.Instruction6502(name="DEC", op_fn=self.op_dec, am_fn=self.am_abx, cycles=7),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 1110
+            self.Instruction6502(name="CPX", op_fn=self.op_cpx, am_fn=self.am_imm, cycles=2),
+            self.Instruction6502(name="SBC", op_fn=self.op_sbc, am_fn=self.am_idx, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="CPX", op_fn=self.op_cpx, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="SBC", op_fn=self.op_sbc, am_fn=self.am_zpg, cycles=3),
+            self.Instruction6502(name="INC", op_fn=self.op_inc, am_fn=self.am_zpg, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="INX", op_fn=self.op_inx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="SBC", op_fn=self.op_sbc, am_fn=self.am_imm, cycles=2),
+            self.Instruction6502(name="NOP", op_fn=self.op_nop, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="CPX", op_fn=self.op_cpx, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="SBC", op_fn=self.op_sbc, am_fn=self.am_abs, cycles=4),
+            self.Instruction6502(name="INC", op_fn=self.op_inc, am_fn=self.am_abs, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            # high nibble 1111
+            self.Instruction6502(name="BEQ", op_fn=self.op_beq, am_fn=self.am_rel, cycles=2),
+            self.Instruction6502(name="SBC", op_fn=self.op_sbc, am_fn=self.am_idy, cycles=5),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="SBC", op_fn=self.op_sbc, am_fn=self.am_zpx, cycles=4),
+            self.Instruction6502(name="INC", op_fn=self.op_inc, am_fn=self.am_zpx, cycles=6),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="SED", op_fn=self.op_sed, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="SBC", op_fn=self.op_sbc, am_fn=self.am_aby, cycles=4),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+            self.Instruction6502(name="SBC", op_fn=self.op_sbc, am_fn=self.am_abx, cycles=4),
+            self.Instruction6502(name="INC", op_fn=self.op_inc, am_fn=self.am_abx, cycles=7),
+            self.Instruction6502(name="???", op_fn=self.op_xxx, am_fn=self.am_imp, cycles=2),
+        ]
 
     @verify(UNIQUE)
     class Flags6502(IntFlag):
@@ -20,15 +293,19 @@ class CPU6502:
 
     # instruction set
     class Instruction6502:
+        def __init__(self, name: str, op_fn: function, am_fn: function, cycles: int) -> None:
+            self.name = name
+            self.op_fn = op_fn
+            self.am_fn = am_fn
+            self.cycles = cycles
+
         name: str
-        op_func: function  # reference to the function that is called for the opcode
-        am_func: function  # reference to the function that is called for address mode
+        op_fn: function  # reference to the function that is called for the opcode
+        am_fn: function  # reference to the function that is called for address mode
         cycles: int  # number of cycles required for the instruction
 
     # instruction set is a 16 * 16 matrix which we store in a flat format
-    instruction_set: list[Instruction6502] = (
-        [Instruction6502()] * 16 * 16
-    )
+    instruction_set: list[Instruction6502] = []
 
     # registers
     accumulator: int = 0x00
@@ -41,13 +318,9 @@ class CPU6502:
     # variables to store internal states
     fetched: int = 0x00
     addr_abs: int = 0x0000  # address used for addressing mode
-    addr_rel: int = (
-        0x0000  # address stored temporarily for jump instructions
-    )
+    addr_rel: int = 0x0000  # address stored temporarily for jump instructions
     opcode: int = 0x00  # opcode currently being executed
-    cycles: int = (
-        0  # cycles elapsed for the duration of the instruction
-    )
+    cycles: int = 0  # cycles elapsed for the duration of the instruction
 
     # clock
     def clock(self) -> None:
@@ -93,7 +366,7 @@ class CPU6502:
         """Immediate addressing mode."""
         return 0
 
-    def am_zp0(self) -> int:
+    def am_zpg(self) -> int:
         """Zero page addressing mode."""
         return 0
 
@@ -125,11 +398,11 @@ class CPU6502:
         """Indirect addressing mode."""
         return 0
 
-    def am_izx(self) -> int:
+    def am_idx(self) -> int:
         """Indirect X addressing mode."""
         return 0
 
-    def am_izy(self) -> int:
+    def am_idy(self) -> int:
         """Indirect Y addressing mode."""
         return 0
 
